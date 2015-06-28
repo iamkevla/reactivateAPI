@@ -1,0 +1,20 @@
+{
+  "name": "reactivateapi",
+  "version": "1.0.0",
+  "description": "Reactivate API Gateway",
+  "main": "server.js",
+  "scripts": {
+    "test": "tes"
+  },
+  "keywords": [
+    "Reactivate",
+    "API",
+    "Gateway",
+    "Koa"
+  ],
+  "author": "kevin.vlahos@gmail.com.au",
+  "license": "ISC",
+  "dependencies": {
+    "koa-pixie-proxy": "^1.0.5"
+  }
+}
