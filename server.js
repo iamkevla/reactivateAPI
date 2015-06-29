@@ -1,18 +1,40 @@
-var pixie = require('koa-pixie-proxy');
+'use strict';
+
 var koa = require('koa');
-var router = require('koa-router');
+var router = require('koa-router')();
+var proxy = require('koa-http-proxy');
+var serve = require('koa-static');
+
+var http = require('http');
+var https = require('https');
+var fs = require('fs');
+var forceSSL = require('koa-force-ssl');
 
 var app = koa();
-app.use(router(app));
 
-var proxy = pixie({host: 'http://example.com'});
+// Force SSL on all page
+app.use(forceSSL());
 
-// Proxy requests to server/hurp to example.com/durp
-app.get('/hurp', proxy('/durp'));
+// SSL options
+var options = {
+  key: fs.readFileSync('privatekey.pem'),
+  cert: fs.readFileSync('certificate.pem')
+}
 
-// works with url params as long as they match the url params
-// in the request to your server
-app.get('some/:param/here/:id', proxy('someother/:param/maybesomethingelse/:id/durp'));
+// start the server
+http.createServer(app.callback()).listen(3000);
+https.createServer(options, app.callback()).listen(3001);
 
-// if you leave out a url it proxies to host + this.url
-app.post('/foobar', proxy());
+
+router.get('/api/v1/sessions', proxy({
+  target: 'https://dealerportaltest.m2group.com.au/api/v1/Users/Login',
+	secure: false
+}));
+
+app
+  .use(router.routes())
+  .use(router.allowedMethods());
+
+// Serve static files
+app.use(serve(path.join(__dirname, 'public')));
+
